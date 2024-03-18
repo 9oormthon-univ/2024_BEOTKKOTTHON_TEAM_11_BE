@@ -20,6 +20,9 @@ local.properties
 .vscode/
 .gradle/
 
+# Build files
+build/
+
 # ignore properties file
 config.properties
 
