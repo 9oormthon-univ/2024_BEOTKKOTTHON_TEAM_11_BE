@@ -17,11 +17,16 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
+    /**
+        eamil을 username으로 사용.
+     */
+    private String username;
+
     private String password;
 
     private String nickname;
 
-    private String email;
+    private String role;
 
     //member이 연관관계 주인
     @OneToMany(mappedBy = "member")
@@ -30,9 +35,10 @@ public class Member {
     @OneToMany(mappedBy = "owner")
     private List<Promise> ownerPromises = new ArrayList<>();
 
-    public Member(String password, String nickname, String email) {
+    public Member(String username, String password, String nickname, String role) {
+        this.username = username;
         this.password = password;
         this.nickname = nickname;
-        this.email = email;
+        this.role = role;
     }
 }
