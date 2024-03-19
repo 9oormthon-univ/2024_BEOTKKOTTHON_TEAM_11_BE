@@ -43,13 +43,31 @@ public class PreferTimetableService {
             int to = -1;
             for (int j = 0; j < preferTimetableDTO.getItems().size(); j++) {
                 // 1. scan 도중 false -> true로 변하는 순간, 시작점으로 설정
-                if (preferTimetableDTO.getItems().get(i) == true && from == -1) {
+                if (preferTimetableDTO.getItems().get(j) && from == -1) {
                     from = j; // 시작점 설정
                 }
 
-                // 2. scan 도중 true -> false로 변하는 순간, 끝점으로 설정
-                if (preferTimetableDTO.getItems().get(j) == false && from != -1) {
-                    to = j; // 끝점 설정
+                //2. 시작점이 정해져있는 상태에서 true를 만나면 그 j값이 배열의 마지막 인덱스이면 시작점부터 배열의 끝까지가 하나의 블럭이다.
+                if (preferTimetableDTO.getItems().get(j) && from != -1) {
+                    if (j == preferTimetableDTO.getItems().size() - 1) { // j가 배열의 끝이라면
+                        to = j; // 끝점이 배열의 끝
+
+                        result.add(i); // Date index (일차)
+                        result.add(from); // Start index of block
+                        result.add(to); // End index of block
+
+                        System.out.println("Debug(flatPreferTimetable) > One of TimeRangeBlock Completed: [" + i + ","
+                                + from + "," + to + "]");
+
+                        // 다음 time range block을 찾기 위해 index를 초기화
+                        from = -1;
+                        to = -1;
+                    }
+                }
+
+                // 3. scan 도중 true -> false로 변하는 순간, 끝점으로 설정
+                if (!preferTimetableDTO.getItems().get(j) && from != -1) {
+                    to = j - 1; // 끝점 설정
 
                     // 이제 시작점과 끝점이 완성되었다.
                     // 하나의 time range block을 순서대로 result에 추가한다.
