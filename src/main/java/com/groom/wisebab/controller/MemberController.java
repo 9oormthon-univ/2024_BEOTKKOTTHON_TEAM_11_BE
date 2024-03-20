@@ -1,5 +1,6 @@
 package com.groom.wisebab.controller;
 
+import com.groom.wisebab.domain.Member;
 import com.groom.wisebab.dto.SignUpDTO;
 import com.groom.wisebab.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -7,12 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,12 +21,25 @@ import java.util.Iterator;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/api/v1/signup")
     public String signUp(SignUpDTO signUpDTO) {
         memberService.createMember(signUpDTO);
         return "ok";
     }
+
+    @PostMapping("/api/v1/logout")
+    public String logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return "ok";
+    }
+
+    @GetMapping("/api/v1/member/{memberId}")
+    public Optional<Member> findMemberById(@PathVariable Long memberId) {
+        return memberService.findMemberById(memberId);
+    }
+
 
 
     @GetMapping("/")
