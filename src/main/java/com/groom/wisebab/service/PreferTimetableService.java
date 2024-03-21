@@ -123,4 +123,56 @@ public class PreferTimetableService {
         // LocalDate 객체를 문자열로 변환
         return date.format(formatter);
     }
+
+    // flatten된 timetable을 DTO로 변환시키는 함수
+    public List<PreferTimetableDTO> unflatPreferTimetable(LocalDate startDate, List<Integer> timetable) {
+        // time range block은 3의 길이를 가지므로(일차,시작점,끝점), 무조건 result는 3의 배수여야 한다.
+        // 따라서, 결과 배열의 길이가 3의 배수가 아니라면, 잘못된 prefer timetable이다.
+        if (timetable.size() % 3 != 0) {
+            throw new IllegalArgumentException("Debug(unflatPreferTimetable) > Invalid prefer timetable");
+        }
+
+        // 결과 배열 생성 및 초기화: 이 변수에 결과가 저장되어 반환 될 것이다.
+        List<PreferTimetableDTO> result = new ArrayList<PreferTimetableDTO>() {
+        };
+
+        for (int i = 0; i < timetable.size(); i += 3) {
+            // block의 start date에 대한 D+day를 가져온다.
+            int dateIndex = timetable.get(i);
+
+            LocalDate date = startDate.plusDays(timetable.get(dateIndex));
+            String dateString = stringifyDate(date); // YYYY-MM-DD 형식으로 변환.
+
+            int from = timetable.get(i + 1);
+            int to = timetable.get(i + 2);
+
+            Boolean isDuplicated = false;
+            // 결과 배열을 탐색하여 이미 존재하는 DTO가 있는지 확인한다.
+            for (PreferTimetableDTO preferTimetableDTO : result) {
+                if (preferTimetableDTO.getDate().equals(dateString)) {
+                    isDuplicated = true;
+                    // 해당 일차에 대한 DTO가 이미 존재한다면, 해당 DTO에 time range block을 추가한다.
+                    for (int j = from; j <= to; j++) { // 이미 가지고 있는 시작/끝 index를 이용해 true로 바꿔준다.
+                        preferTimetableDTO.getItems().set(j, true);
+                    }
+                    continue;
+                }
+                ;
+            }
+
+            // 만역 존재하지 않는다면, 새로운 DTO를 생성하여 블록을 집어넣는다.
+            if (!isDuplicated) {
+                // 새로운 DTO를 만든다.
+                PreferTimetableDTO preferTimetableDTO = new PreferTimetableDTO();
+                preferTimetableDTO.setDate(dateString);
+                for (int j = from; j <= to; j++) { // 이미 가지고 있는 시작/끝 index를 이용해 true로 바꿔준다.
+                    preferTimetableDTO.getItems().set(j, true);
+                }
+                result.add(preferTimetableDTO); // 결과 배열에 추가
+            }
+
+        }
+
+        return result;
+    }
 }
