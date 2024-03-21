@@ -8,6 +8,9 @@ import com.groom.wisebab.dto.PreferTimetableDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +50,7 @@ public class PreferTimetableService {
                     from = j; // 시작점 설정
                 }
 
-                //2. 시작점이 정해져있는 상태에서 true를 만나면 그 j값이 배열의 마지막 인덱스이면 시작점부터 배열의 끝까지가 하나의 블럭이다.
+                // 2. 시작점이 정해져있는 상태에서 true를 만나면 그 j값이 배열의 마지막 인덱스이면 시작점부터 배열의 끝까지가 하나의 블럭이다.
                 if (preferTimetableDTO.getItems().get(j) && from != -1) {
                     if (j == preferTimetableDTO.getItems().size() - 1) { // j가 배열의 끝이라면
                         to = j; // 끝점이 배열의 끝
@@ -96,5 +99,20 @@ public class PreferTimetableService {
         System.out.println("Debug(flatPreferTimetable) > finded block count:" + result.size() / 3);
 
         return result;
+    }
+
+    // YYYY-MM-DD 형식의 문자열을 LocalDate 객체로 파싱하는 함수
+    public static LocalDate parseDate(String dateString) {
+        // 날짜 형식 지정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        try {
+            // 문자열을 LocalDate 객체로 파싱
+            LocalDate parsedDate = LocalDate.parse(dateString, formatter);
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            // 파싱 실패 시 예외 처리
+            throw new IllegalArgumentException("Debug(parseDate) > wrong date format: " + dateString);
+        }
     }
 }
