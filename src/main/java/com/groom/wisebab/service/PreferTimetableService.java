@@ -115,4 +115,12 @@ public class PreferTimetableService {
             throw new IllegalArgumentException("Debug(parseDate) > wrong date format: " + dateString);
         }
     }
+
+    public static String stringifyDate(LocalDate date) {
+        // 날짜 형식 지정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // LocalDate 객체를 문자열로 변환
+        return date.format(formatter);
+    }
 }
