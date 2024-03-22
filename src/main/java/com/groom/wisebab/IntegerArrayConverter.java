@@ -14,13 +14,15 @@ public class IntegerArrayConverter implements AttributeConverter<List<Integer>, 
 
     @Override
     public String convertToDatabaseColumn(List<Integer> attribute) {
-        return attribute.stream().map(String::valueOf).collect(Collectors.joining(SPLIT_CHAR));
+        return attribute.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(SPLIT_CHAR));
     }
 
     @Override
     public List<Integer> convertToEntityAttribute(String dbData) {
         return Arrays.stream(dbData.split(SPLIT_CHAR))
-                .map(Integer::parseInt)
+                .map(Integer::valueOf)
                 .collect(Collectors.toList());
 
     }

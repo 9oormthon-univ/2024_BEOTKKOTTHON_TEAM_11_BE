@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,7 +27,8 @@ public class PreferTimetable {
     private Promise promise;
 
     @Convert(converter = IntegerArrayConverter.class)
-    private List<Integer> preferTime;
+    private List<Integer> preferTime = new ArrayList<>();
+
 
     public PreferTimetable(Member member, Promise promise, List<Integer> preferTime) {
         this.member = member;

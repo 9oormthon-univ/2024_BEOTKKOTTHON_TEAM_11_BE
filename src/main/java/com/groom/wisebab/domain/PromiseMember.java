@@ -2,10 +2,12 @@ package com.groom.wisebab.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "promise_member")
 @Getter
+@NoArgsConstructor
 public class PromiseMember {
 
     @Id
@@ -21,5 +23,8 @@ public class PromiseMember {
     @JoinColumn(name = "member_id")
     private Member member;
 
-
+    public PromiseMember(Promise promise, Member member) {
+        this.promise = promise;
+        this.member = member;
+    }
 }

@@ -1,7 +1,7 @@
 package com.groom.wisebab.service;
 
 import com.groom.wisebab.domain.Member;
-import com.groom.wisebab.dto.CustomUserDetails;
+import com.groom.wisebab.dto.member.CustomUserDetails;
 import com.groom.wisebab.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
