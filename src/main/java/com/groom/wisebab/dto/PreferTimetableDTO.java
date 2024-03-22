@@ -9,6 +9,10 @@ import lombok.Setter;
 @Setter
 public class PreferTimetableDTO {
 
+    /**
+     * 선호시간 request DTO
+     */
+
     private String date;
 
     private List<Boolean> items;

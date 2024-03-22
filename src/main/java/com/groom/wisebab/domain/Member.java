@@ -29,11 +29,14 @@ public class Member {
     private String role;
 
     //member이 연관관계 주인
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<PromiseMember> promises = new ArrayList<>();
-
-    @OneToMany(mappedBy = "owner")
+/*
+    //member이 연관관계 주인
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Promise> ownerPromises = new ArrayList<>();
+
+ */
 
     public Member(String username, String password, String nickname, String role) {
         this.username = username;
@@ -42,11 +45,4 @@ public class Member {
         this.role = role;
     }
 
-    public void changePassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    public void changeNickname(String newNickName) {
-        this.nickname = newNickName;
-    }
 }

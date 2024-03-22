@@ -7,6 +7,7 @@ import com.groom.wisebab.repository.PreferTimetableRepository;
 import com.groom.wisebab.dto.PreferTimetableDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,27 +17,31 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PreferTimetableService {
 
     private final PreferTimetableRepository preferTimetableRepository;
 
-    public Long createPreferTimetable(Promise promise, Member member, List<Integer> preferTime) {
-        PreferTimetable preferTimetable = new PreferTimetable(member, promise, preferTime);
+    @Transactional
+    public Long createPreferTimetable(Promise promise, Member member, List<PreferTimetableDTO> timetableDTOS) {
+        List<Integer> timetables = flatPreferTimetable(timetableDTOS);
+        PreferTimetable preferTimetable = new PreferTimetable(member, promise, timetables);
         preferTimetableRepository.save(preferTimetable);
 
         return preferTimetable.getId();
     }
 
-    public PreferTimetable setPreferTimetableByUser(Long id) {
-        return preferTimetableRepository.findById(id).orElse(null);
+    public List<PreferTimetableDTO> findTimetableByPromiseAndMember(Promise promise, Member member) {
+        PreferTimetable preferTimeTable = preferTimetableRepository.findPreferTimeTableByPromiseAndMember(promise, member);
+        return unflatPreferTimetable(promise.getStartDate(), preferTimeTable.getPreferTime());
     }
+
 
     // 한 유저로부터 입력받은 PreferTimetableDTO를 flatten 시키는 함수
     public List<Integer> flatPreferTimetable(List<PreferTimetableDTO> timetable) {
 
         // 결과 배열 생성 및 초기화: 이 변수에 결과가 저장되어 반환 될 것이다.
-        List<Integer> result = new ArrayList<>() {
-        };
+        List<Integer> result = new ArrayList<>();
 
         for (int i = 0; i < timetable.size(); i++) { // 일차별로 scan
             PreferTimetableDTO preferTimetableDTO = timetable.get(i);
@@ -102,7 +107,7 @@ public class PreferTimetableService {
     }
 
     // YYYY-MM-DD 형식의 문자열을 LocalDate 객체로 파싱하는 함수
-    public static LocalDate parseDate(String dateString) {
+    public LocalDate parseDate(String dateString) {
         // 날짜 형식 지정
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -116,13 +121,14 @@ public class PreferTimetableService {
         }
     }
 
-    public static String stringifyDate(LocalDate date) {
+    public String stringifyDate(LocalDate date) {
         // 날짜 형식 지정
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // LocalDate 객체를 문자열로 변환
         return date.format(formatter);
     }
+
 
     // flatten된 timetable을 DTO로 변환시키는 함수
     public List<PreferTimetableDTO> unflatPreferTimetable(LocalDate startDate, List<Integer> timetable) {
@@ -139,9 +145,11 @@ public class PreferTimetableService {
         for (int i = 0; i < timetable.size(); i += 3) {
             // block의 start date에 대한 D+day를 가져온다.
             int dateIndex = timetable.get(i);
+            System.out.println("dateIndex = " + dateIndex);
 
-            LocalDate date = startDate.plusDays(timetable.get(dateIndex));
+            LocalDate date = startDate.plusDays(dateIndex);
             String dateString = stringifyDate(date); // YYYY-MM-DD 형식으로 변환.
+            System.out.println("dateString = " + dateString);
 
             int from = timetable.get(i + 1);
             int to = timetable.get(i + 2);
@@ -157,7 +165,7 @@ public class PreferTimetableService {
                     }
                     continue;
                 }
-                ;
+
             }
 
             // 만역 존재하지 않는다면, 새로운 DTO를 생성하여 블록을 집어넣는다.
@@ -165,6 +173,16 @@ public class PreferTimetableService {
                 // 새로운 DTO를 만든다.
                 PreferTimetableDTO preferTimetableDTO = new PreferTimetableDTO();
                 preferTimetableDTO.setDate(dateString);
+
+                // 24개의 블록을 생성하고 false로 초기화한다.
+                preferTimetableDTO.setItems(new ArrayList<Boolean>(24) {
+                    {
+                        for (int i = 0; i < 24; i++) {
+                            add(false);
+                        }
+                    }
+                });
+
                 for (int j = from; j <= to; j++) { // 이미 가지고 있는 시작/끝 index를 이용해 true로 바꿔준다.
                     preferTimetableDTO.getItems().set(j, true);
                 }
@@ -175,4 +193,7 @@ public class PreferTimetableService {
 
         return result;
     }
+
+
 }
+

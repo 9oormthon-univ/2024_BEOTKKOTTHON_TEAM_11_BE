@@ -1,4 +1,4 @@
-package com.groom.wisebab.dto;
+package com.groom.wisebab.dto.member;
 
 import com.groom.wisebab.domain.Member;
 import lombok.RequiredArgsConstructor;

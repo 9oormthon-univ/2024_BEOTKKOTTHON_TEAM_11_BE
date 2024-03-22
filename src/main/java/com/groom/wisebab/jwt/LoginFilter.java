@@ -1,6 +1,6 @@
 package com.groom.wisebab.jwt;
 
-import com.groom.wisebab.dto.CustomUserDetails;
+import com.groom.wisebab.dto.member.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
