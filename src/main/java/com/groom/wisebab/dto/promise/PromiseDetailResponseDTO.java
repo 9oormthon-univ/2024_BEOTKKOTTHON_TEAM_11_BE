@@ -3,9 +3,7 @@ package com.groom.wisebab.dto.promise;
 import com.groom.wisebab.domain.State;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,6 +35,10 @@ public class PromiseDetailResponseDTO {
     private String locName;
 
     private String locAddress;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
     private String memo;
 

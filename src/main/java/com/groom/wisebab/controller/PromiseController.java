@@ -9,12 +9,10 @@ import com.groom.wisebab.service.PromiseMemberService;
 import com.groom.wisebab.service.PromiseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -56,16 +54,19 @@ public class PromiseController {
         return ResponseEntity.ok(promiseListResponseDTOList);
     }
 
+    // 대기중인 약속 -> 확정된 약속
     @PatchMapping("/promises/{promiseId}/confirmation")
     public Long updateToConfirmed(@PathVariable Long promiseId, @RequestBody UpdateToConfirmedDTO updateToConfirmedDTO) {
         return promiseService.changeStatusToConfirmed(promiseId, updateToConfirmedDTO);
     }
 
+    // 확정된 약속 -> 만료된 약속
     @PatchMapping("/promises/{promiseId}/termination")
     public Long updateToExpired(@PathVariable Long promiseId, @RequestBody UpdateToExpiredDTO updateToExpiredDTO) {
         return promiseService.changeStatusToExpired(promiseId, updateToExpiredDTO);
     }
 
+    // 약속의 초대 링크 조회
     @GetMapping("/promises/{promiseId}/link")
     public ResponseEntity<PromiseLinkDTO> getPromiseLink(@PathVariable Long promiseId) {
         Promise promise = promiseService.findPromiseById(promiseId)
@@ -79,6 +80,7 @@ public class PromiseController {
         return ResponseEntity.ok(promiseLinkDTO);
     }
 
+    // uuid로 이루어진 초대링크를 접속하면 그 회원을 약속 파티원으로 추가
     @PostMapping("/members/{memberId}/promises/{uuid}")
     public Long memberParticipation(@PathVariable Long memberId, @PathVariable UUID uuid) {
         Member member = memberService.findMemberById(memberId)
@@ -86,6 +88,14 @@ public class PromiseController {
                         NullPointerException::new
                 );
         return promiseService.memberParticipation(member, uuid);
+    }
+
+    // 약속의 송금 정보 조회
+    @GetMapping("/promises/{promiseId}/payment")
+    public ResponseEntity<PromisePaymentResponseDTO> getPaymentInfo(@PathVariable Long promiseId) {
+        PromisePaymentResponseDTO promisePaymentResponseDTO = promiseService.getPaymentInfo(promiseId);
+
+        return ResponseEntity.ok(promisePaymentResponseDTO);
     }
 
 }

@@ -22,6 +22,7 @@ public class PreferTimetableService {
 
     private final PreferTimetableRepository preferTimetableRepository;
 
+    // 선호 시간표 제출 시 preferTimeTable 생성
     @Transactional
     public Long createPreferTimetable(Promise promise, Member member, List<PreferTimetableDTO> timetableDTOS) {
         List<Integer> timetables = flatPreferTimetable(timetableDTOS);
@@ -31,6 +32,7 @@ public class PreferTimetableService {
         return preferTimetable.getId();
     }
 
+    // 약속에서 멤버별 선호시간을 반환
     public List<PreferTimetableDTO> findTimetableByPromiseAndMember(Promise promise, Member member) {
         PreferTimetable preferTimeTable = preferTimetableRepository.findPreferTimeTableByPromiseAndMember(promise, member);
         return unflatPreferTimetable(promise.getStartDate(), preferTimeTable.getPreferTime());

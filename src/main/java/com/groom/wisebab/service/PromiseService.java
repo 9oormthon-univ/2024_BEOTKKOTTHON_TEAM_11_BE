@@ -29,13 +29,14 @@ public class PromiseService {
     private final PromiseMemberRepository promiseMemberRepository;
     private final PreferTimetableRepository preferTimetableRepository;
 
+    // 약속 생성
     @Transactional
     public Long createPromise(PromiseDTO promiseDTO) {
         Member owner = memberRepository.findById(promiseDTO.getOwnerId())
                 .orElseThrow(
                         NullPointerException::new
                 );
-        Promise promise = new Promise(promiseDTO.getTitle(), owner.getId(), promiseDTO.getLocName(), promiseDTO.getLocAddress(), promiseDTO.getStartDate(), promiseDTO.getMemo());
+        Promise promise = new Promise(promiseDTO.getTitle(), owner.getId(), promiseDTO.getLocName(), promiseDTO.getLocAddress(), promiseDTO.getStartDate(), promiseDTO.getEndDate(), promiseDTO.getMemo());
         promiseRepository.save(promise);
 
         PromiseMember promiseMember = new PromiseMember(promise, owner);
@@ -47,14 +48,12 @@ public class PromiseService {
         return promise.getId();
     }
 
+    // PromiseId를 통해 약속 조회
     public Optional<Promise> findPromiseById(Long id) {
         return promiseRepository.findById(id);
     }
 
-    public List<Promise> findAllPromiseByState(State state) {
-        return promiseRepository.findAllByState(state);
-    }
-
+    // 약속 리스트 DTO로 변환
     public List<PromiseListResponseDTO> converToDTOList(List<Promise> promises) {
         return promises.stream()
                 .map(promise -> new PromiseListResponseDTO(
@@ -72,6 +71,7 @@ public class PromiseService {
                 .collect(Collectors.toList());
     }
 
+    // 약속 상세정보 DTO로 변환
     public PromiseDetailResponseDTO convertToDTO(Long promiseId, Long memberId) {
         Promise promise = promiseRepository.findById(promiseId)
                 .orElseThrow(
@@ -97,9 +97,10 @@ public class PromiseService {
 
         boolean allResponded = confirmedPeopleCount == promise.getMemberList().size();
 
-        return new PromiseDetailResponseDTO(promise.getId(), promise.getState(), promise.getTitle(), owner.getNickname(), isLeader, promise.getConfirmedDate(), promise.getConfirmedTime(), promise.getLocName(), promise.getLocAddress(), promise.getMemo(), promiseMembersInnerResponseDTOS, confirmedPeopleCount, allResponded);
+        return new PromiseDetailResponseDTO(promise.getId(), promise.getState(), promise.getTitle(), owner.getNickname(), isLeader, promise.getConfirmedDate(), promise.getConfirmedTime(), promise.getLocName(), promise.getLocAddress(), promise.getStartDate(), promise.getEndDate(), promise.getMemo(), promiseMembersInnerResponseDTOS, confirmedPeopleCount, allResponded);
     }
 
+    // 대기중인 약속 -> 확정된 약속으로
     @Transactional
     public Long changeStatusToConfirmed(Long promiseId, UpdateToConfirmedDTO updateToConfirmedDTO) {
         Promise promise = promiseRepository.findById(promiseId)
@@ -111,6 +112,7 @@ public class PromiseService {
         return promise.getId();
     }
 
+    // 확정된 약속 -> 만료된 약속
     @Transactional
     public Long changeStatusToExpired(Long promiseId, UpdateToExpiredDTO updateToExpiredDTO) {
         Promise promise = promiseRepository.findById(promiseId)
@@ -122,6 +124,7 @@ public class PromiseService {
         return promise.getId();
     }
 
+    // 초대링크(UUID)로 들어오는 회원을 참가시키는 메서드
     @Transactional
     public Long memberParticipation(Member member, UUID uuid) {
         Promise promise = promiseRepository.findPromiseByUuid(uuid);
@@ -131,5 +134,14 @@ public class PromiseService {
         PromiseMember savedPromiseMember = promiseMemberRepository.save(promiseMember);
 
         return savedPromiseMember.getPromise().getId();
+    }
+
+    // 송금 정보 조회
+    public PromisePaymentResponseDTO getPaymentInfo(Long promiseId) {
+        Promise promise = promiseRepository.findById(promiseId)
+                .orElseThrow(
+                        NullPointerException::new
+                );
+        return new PromisePaymentResponseDTO(promise.getPayMemo(), promise.getKakaopayLink(), promise.getBankAccount());
     }
 }

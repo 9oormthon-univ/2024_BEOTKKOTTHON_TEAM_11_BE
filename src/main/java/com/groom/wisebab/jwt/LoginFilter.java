@@ -1,9 +1,12 @@
 package com.groom.wisebab.jwt;
 
+import com.groom.wisebab.domain.Member;
 import com.groom.wisebab.dto.member.CustomUserDetails;
+import com.groom.wisebab.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,16 +17,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.Collection;
 import java.util.Iterator;
 
+@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
-
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
-
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {

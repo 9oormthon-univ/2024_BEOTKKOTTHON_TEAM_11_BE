@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +23,7 @@ public class PreferTimetableController {
     private final MemberService memberService;
     private final PromiseService promiseService;
 
+    // 약속 선호 시간 생성
     @PostMapping("/promises/{promiseId}/members/{memberId}")
     public Long createPreferTimetable(@PathVariable Long promiseId, @PathVariable Long memberId, @RequestBody List<PreferTimetableDTO> preferTimetableDTOS) {
         Promise promise = promiseService.findPromiseById(promiseId)
@@ -38,6 +38,7 @@ public class PreferTimetableController {
         return preferTimetableService.createPreferTimetable(promise, member, preferTimetableDTOS);
     }
 
+    // 약속에서 해당 회원이 제출한 선호 시간표 조회
     @GetMapping("/promises/{promiseId}/members/{memberId}")
     public ResponseEntity<List<PreferTimetableDTO>> findTimetableByPromiseAndMember(@PathVariable Long promiseId, @PathVariable Long memberId) {
         log.info("컨트롤러 진입");
@@ -52,7 +53,7 @@ public class PreferTimetableController {
                 );
         log.info("회원 조회 완료");
         List<PreferTimetableDTO> preferTimetableDTOS = preferTimetableService.findTimetableByPromiseAndMember(promise, member);
-        log.info("리턴 직전");
+        log.info("DTO에 담기 성공");
         return ResponseEntity.ok(preferTimetableDTOS);
     }
 }

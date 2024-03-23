@@ -31,12 +31,6 @@ public class Member {
     //member이 연관관계 주인
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<PromiseMember> promises = new ArrayList<>();
-/*
-    //member이 연관관계 주인
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Promise> ownerPromises = new ArrayList<>();
-
- */
 
     public Member(String username, String password, String nickname, String role) {
         this.username = username;
