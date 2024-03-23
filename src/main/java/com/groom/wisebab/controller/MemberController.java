@@ -24,7 +24,7 @@ import java.util.Optional;
 public class MemberController {
 
     private final MemberService memberService;
-    private final String UnivCertKEY = "dfafd059-19f9-4553-ac2a-07f9d498739a";
+    private final String UnivCertKEY = "48ad7af1-31bc-4c1f-ad01-f06001a618da";
 
     @PostMapping("/signup")
     public Long signUp(SignUpDTO signUpDTO) {
