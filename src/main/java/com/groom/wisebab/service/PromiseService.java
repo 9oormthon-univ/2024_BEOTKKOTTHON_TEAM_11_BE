@@ -131,4 +131,9 @@ public class PromiseService {
                 );
         return new PromisePaymentResponseDTO(promise.getPayMemo(), promise.getKakaopayLink(), promise.getBankAccount());
     }
+
+    public Promise findPromiseByUuid(UUID uuid) {
+        return promiseRepository.findPromiseByUuid(uuid);
+    }
+
 }

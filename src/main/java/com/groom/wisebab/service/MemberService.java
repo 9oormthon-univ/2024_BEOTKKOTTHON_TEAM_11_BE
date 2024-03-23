@@ -52,7 +52,7 @@ public class MemberService {
         return new MemberResponseDTO(member.getId(), member.getUsername(), member.getNickname());
     }
 
-    public Member findMemberByUsername(String username) {
+    public Optional<Member> findMemberByUsername(String username) {
         return memberRepository.findByUsername(username);
     }
 }

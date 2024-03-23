@@ -3,16 +3,14 @@ package com.groom.wisebab.controller;
 import com.groom.wisebab.domain.Member;
 import com.groom.wisebab.dto.email.EmailCertifyCodeDTO;
 import com.groom.wisebab.dto.email.EmailCertifyDTO;
-import com.groom.wisebab.dto.member.LoginRequest;
 import com.groom.wisebab.dto.member.MemberResponseDTO;
 import com.groom.wisebab.dto.member.SignUpDTO;
-import com.groom.wisebab.jwt.JWTUtil;
 import com.groom.wisebab.service.MemberService;
 import com.univcert.api.UnivCert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,16 +27,14 @@ public class MemberController {
     private final String UnivCertKEY = "48ad7af1-31bc-4c1f-ad01-f06001a618da";
 
     @PostMapping("/signup")
-    public Long signUp(@RequestBody SignUpDTO signUpDTO) {
-        return memberService.createMember(signUpDTO);
-    }
+    public ResponseEntity<?> signUp(@RequestBody SignUpDTO signUpDTO) {
+        if (memberService.findMemberByUsername(signUpDTO.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 이메일입니다.");
+        }
 
-    /*
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        authenticationManager.authenticate()
+        Long memberId = memberService.createMember(signUpDTO);
+        return ResponseEntity.ok(memberId);
     }
-    */
 
     @PostMapping("/logout")
     public String logout() {
@@ -58,7 +54,10 @@ public class MemberController {
 
     @GetMapping("/memberByUsername/{memberUsername}")
     public ResponseEntity<MemberResponseDTO> findMemberByUsername(@PathVariable String memberUsername) {
-        Member member = memberService.findMemberByUsername(memberUsername);
+        Member member = memberService.findMemberByUsername(memberUsername)
+                .orElseThrow(
+                        NullPointerException::new
+                );
         MemberResponseDTO memberResponseDTO = new MemberResponseDTO(member.getId(), member.getUsername(), member.getNickname());
 
         return ResponseEntity.ok(memberResponseDTO);
