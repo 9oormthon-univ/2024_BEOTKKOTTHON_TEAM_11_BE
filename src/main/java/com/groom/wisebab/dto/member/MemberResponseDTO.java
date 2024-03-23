@@ -9,6 +9,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MemberResponseDTO {
 
+    /**
+     * 멤버 정보 조회 DTO
+     */
+
     private Long id;
 
     private String username;

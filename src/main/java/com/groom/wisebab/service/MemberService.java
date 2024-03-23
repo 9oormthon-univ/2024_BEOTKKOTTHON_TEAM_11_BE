@@ -30,21 +30,18 @@ public class MemberService {
         return member.getId();
     }
 
-
-
-    public Member findMemberByUsername(String username) {
-        return memberRepository.findByUsername(username);
-    }
-
-    public Member findMemberByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname);
-    }
-
     public Optional<Member> findMemberById(Long id) {
         return memberRepository.findById(id);
     }
 
     public MemberResponseDTO convertToDTO(Member member) {
         return new MemberResponseDTO(member.getId(), member.getUsername(), member.getNickname());
+    }
+
+    public Member findMemberByUsername(String username) {
+        return memberRepository.findByUsername(username)
+                .orElseThrow(
+                        NullPointerException::new
+                );
     }
 }

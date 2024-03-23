@@ -1,7 +1,6 @@
 package com.groom.wisebab.dto.member;
 
 import com.groom.wisebab.domain.Member;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
