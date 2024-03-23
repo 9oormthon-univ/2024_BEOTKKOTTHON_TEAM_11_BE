@@ -35,4 +35,8 @@ public class PreferTimetable {
         this.promise = promise;
         this.preferTime = preferTime;
     }
+
+    public void updatePreferTimetable(List<Integer> preferTime) {
+        this.preferTime = preferTime;
+    }
 }

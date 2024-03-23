@@ -38,6 +38,20 @@ public class PreferTimetableController {
         return preferTimetableService.createPreferTimetable(promise, member, preferTimetableDTOS);
     }
 
+    @PutMapping("/promises/{promiseId}/members/{memberId}")
+    public Long updatePreferTimetable(@PathVariable Long promiseId, @PathVariable Long memberId, @RequestBody List<PreferTimetableDTO> preferTimetableDTOS) {
+        Promise promise = promiseService.findPromiseById(promiseId)
+                .orElseThrow(
+                        NullPointerException::new
+                );
+        Member member = memberService.findMemberById(memberId)
+                .orElseThrow(
+                        NullPointerException::new
+                );
+
+        return preferTimetableService.updatePreferTimetable(promise, member, preferTimetableDTOS);
+    }
+
     // 약속에서 해당 회원이 제출한 선호 시간표 조회
     @GetMapping("/promises/{promiseId}/members/{memberId}")
     public ResponseEntity<List<PreferTimetableDTO>> findTimetableByPromiseAndMember(@PathVariable Long promiseId, @PathVariable Long memberId) {
