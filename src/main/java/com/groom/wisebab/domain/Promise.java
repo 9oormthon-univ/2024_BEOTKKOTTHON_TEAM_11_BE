@@ -25,7 +25,7 @@ public class Promise {
     @JoinColumn(name = "member_id")
     private Member owner;
  */
-    private String ownerName;
+    private Long ownerId;
 
     //promise가 연관관계 주인
     @OneToMany(mappedBy = "promise", cascade = CascadeType.ALL)
@@ -62,9 +62,9 @@ public class Promise {
     @Column(columnDefinition = "BINARY(16)")
     private UUID uuid;
 
-    public Promise(String title, String ownerName, String locName, String locAddress, LocalDate startDate, String memo) {
+    public Promise(String title, Long ownerId, String locName, String locAddress, LocalDate startDate, String memo) {
         this.title = title;
-        this.ownerName = ownerName;
+        this.ownerId = ownerId;
         this.state = State.PENDING;
         this.locName = locName;
         this.locAddress = locAddress;

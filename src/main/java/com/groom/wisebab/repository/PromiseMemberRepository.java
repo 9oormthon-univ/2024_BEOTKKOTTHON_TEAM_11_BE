@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PromiseMemberRepository extends JpaRepository<PromiseMember, Long> {
     List<PromiseMember> findAllByMemberId(Long memberId);
+
+    List<PromiseMember> findAllByPromiseId(Long promiseId);
 }
