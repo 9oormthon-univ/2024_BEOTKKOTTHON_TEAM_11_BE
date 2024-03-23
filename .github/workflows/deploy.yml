@@ -26,7 +26,7 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            cd ~/prod/2024_BEOTKKOTTHON
+            cd ~/prod/2024_BEOTKKOTTHON/Backend
             podman-compose down 2>&1
 
       - name: Getting source and build
