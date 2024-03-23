@@ -6,6 +6,7 @@ import com.groom.wisebab.domain.PromiseMember;
 import com.groom.wisebab.domain.State;
 import com.groom.wisebab.dto.promise.*;
 import com.groom.wisebab.repository.MemberRepository;
+import com.groom.wisebab.repository.PreferTimetableRepository;
 import com.groom.wisebab.repository.PromiseMemberRepository;
 import com.groom.wisebab.repository.PromiseRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ public class PromiseService {
     private final PromiseRepository promiseRepository;
     private final MemberRepository memberRepository;
     private final PromiseMemberRepository promiseMemberRepository;
+    private final PreferTimetableRepository preferTimetableRepository;
 
     @Transactional
     public Long createPromise(PromiseDTO promiseDTO) {
@@ -32,7 +35,7 @@ public class PromiseService {
                 .orElseThrow(
                         NullPointerException::new
                 );
-        Promise promise = new Promise(promiseDTO.getTitle(), owner.getNickname(), promiseDTO.getLocName(), promiseDTO.getLocAddress(), promiseDTO.getStartDate(), promiseDTO.getMemo());
+        Promise promise = new Promise(promiseDTO.getTitle(), owner.getId(), promiseDTO.getLocName(), promiseDTO.getLocAddress(), promiseDTO.getStartDate(), promiseDTO.getMemo());
         promiseRepository.save(promise);
 
         PromiseMember promiseMember = new PromiseMember(promise, owner);
@@ -59,7 +62,7 @@ public class PromiseService {
                         promise.getTitle(),
                         promise.getState(),
                         promise.getLocName(),
-                        promise.getOwnerName(),
+                        memberRepository.findById(promise.getOwnerId()).get().getUsername(),
                         promise.getConfirmedDate(),
                         promise.getConfirmedTime(),
                         promise.getMemberList().stream()
@@ -69,11 +72,32 @@ public class PromiseService {
                 .collect(Collectors.toList());
     }
 
-    public PromiseDetailResponseDTO convertToDTO(Promise promise) {
+    public PromiseDetailResponseDTO convertToDTO(Long promiseId, Long memberId) {
+        Promise promise = promiseRepository.findById(promiseId)
+                .orElseThrow(
+                        NullPointerException::new
+                );
+
         List<PromiseMembersInnerResponseDTO> promiseMembersInnerResponseDTOS = promise.getMemberList().stream()
+                .filter(promiseMember -> !Objects.equals(promiseMember.getMember().getId(), promise.getOwnerId()))
                 .map(promiseMember -> new PromiseMembersInnerResponseDTO(promiseMember.getMember().getId(), promiseMember.getMember().getNickname()))
                 .collect(Collectors.toList());
-        return new PromiseDetailResponseDTO(promise.getId(), promise.getState(), promise.getTitle(), promise.getOwnerName(), promise.getConfirmedDate(), promise.getConfirmedTime(), promise.getLocName(), promise.getLocAddress(), promise.getMemo(), promiseMembersInnerResponseDTOS);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(
+                        NullPointerException::new
+                );
+        Member owner = memberRepository.findById(promise.getOwnerId())
+                .orElseThrow(
+                        NullPointerException::new
+                );
+        boolean isLeader = member.getId().equals(owner.getId());
+
+        int confirmedPeopleCount = preferTimetableRepository.findAllByPromise(promise).size();
+
+        boolean allResponded = confirmedPeopleCount == promise.getMemberList().size();
+
+        return new PromiseDetailResponseDTO(promise.getId(), promise.getState(), promise.getTitle(), owner.getNickname(), isLeader, promise.getConfirmedDate(), promise.getConfirmedTime(), promise.getLocName(), promise.getLocAddress(), promise.getMemo(), promiseMembersInnerResponseDTOS, confirmedPeopleCount, allResponded);
     }
 
     @Transactional
@@ -106,6 +130,6 @@ public class PromiseService {
         promise.getMemberList().add(promiseMember);
         PromiseMember savedPromiseMember = promiseMemberRepository.save(promiseMember);
 
-        return savedPromiseMember.getId();
+        return savedPromiseMember.getPromise().getId();
     }
 }
