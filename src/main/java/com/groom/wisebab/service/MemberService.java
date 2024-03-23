@@ -39,9 +39,6 @@ public class MemberService {
     }
 
     public Member findMemberByUsername(String username) {
-        return memberRepository.findByUsername(username)
-                .orElseThrow(
-                        NullPointerException::new
-                );
+        return memberRepository.findByUsername(username);
     }
 }
