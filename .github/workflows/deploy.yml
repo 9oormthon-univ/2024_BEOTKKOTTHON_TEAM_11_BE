@@ -27,7 +27,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd ~/prod/2024_BEOTKKOTTHON
-            sudo podman-compose down
+            podman-compose down 2>&1
 
       - name: Getting source and build
         uses: appleboy/ssh-action@v1.0.0
@@ -40,9 +40,10 @@ jobs:
             cd ~/prod/2024_BEOTKKOTTHON/Backend
             git pull
             rm -rf ./build
+            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-17.0.10.0.7-2.el8.x86_64
             ./gradlew bootJar
-            sudo podman image rm 2024goormthon/backend
-            sudo podman build -t 2024goormthon/backend .
+            podman rmi 2024goormthon/backend 2>&1
+            podman build -t 2024goormthon/backend .
             
       - name: Run deployment
         uses: appleboy/ssh-action@v1.0.0
@@ -53,4 +54,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd ~/prod/2024_BEOTKKOTTHON/Backend
-            sudo podman-compose up -d
+            podman-compose up -d
