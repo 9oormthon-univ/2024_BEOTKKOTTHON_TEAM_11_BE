@@ -56,7 +56,7 @@ public class MemberController {
         return ResponseEntity.ok(memberResponseDTO);
     }
 
-    @GetMapping("/members/{memberUsername}")
+    @GetMapping("/members/username/{memberUsername}")
     public ResponseEntity<MemberResponseDTO> findMemberByUsername(@PathVariable String memberUsername) {
         Member member = memberService.findMemberByUsername(memberUsername);
         MemberResponseDTO memberResponseDTO = new MemberResponseDTO(member.getId(), member.getUsername(), member.getNickname());

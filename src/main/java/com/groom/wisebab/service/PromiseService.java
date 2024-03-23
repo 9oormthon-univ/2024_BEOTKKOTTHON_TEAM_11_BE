@@ -54,20 +54,11 @@ public class PromiseService {
     }
 
     // 약속 리스트 DTO로 변환
-    public List<PromiseListResponseDTO> converToDTOList(List<Promise> promises) {
+    public List<PromiseDetailResponseDTO> converToDTOList(List<Promise> promises, Long memberId) {
         return promises.stream()
-                .map(promise -> new PromiseListResponseDTO(
-                        promise.getId(),
-                        promise.getTitle(),
-                        promise.getState(),
-                        promise.getLocName(),
-                        memberRepository.findById(promise.getOwnerId()).get().getUsername(),
-                        promise.getConfirmedDate(),
-                        promise.getConfirmedTime(),
-                        promise.getMemberList().stream()
-                                .map(promiseMember -> new PromiseMembersInnerResponseDTO(promiseMember.getMember().getId(), promiseMember.getMember().getNickname()))
-                                .collect(Collectors.toList())
-                ))
+                .map(promise ->
+                        convertToDTO(promise.getId(), memberId)
+                )
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +70,6 @@ public class PromiseService {
                 );
 
         List<PromiseMembersInnerResponseDTO> promiseMembersInnerResponseDTOS = promise.getMemberList().stream()
-                .filter(promiseMember -> !Objects.equals(promiseMember.getMember().getId(), promise.getOwnerId()))
                 .map(promiseMember -> new PromiseMembersInnerResponseDTO(promiseMember.getMember().getId(), promiseMember.getMember().getNickname()))
                 .collect(Collectors.toList());
 
@@ -87,17 +77,14 @@ public class PromiseService {
                 .orElseThrow(
                         NullPointerException::new
                 );
-        Member owner = memberRepository.findById(promise.getOwnerId())
-                .orElseThrow(
-                        NullPointerException::new
-                );
-        boolean isLeader = member.getId().equals(owner.getId());
+
+        boolean isLeader = member.getId().equals(promise.getOwnerId());
 
         int confirmedPeopleCount = preferTimetableRepository.findAllByPromise(promise).size();
 
         boolean allResponded = confirmedPeopleCount == promise.getMemberList().size();
 
-        return new PromiseDetailResponseDTO(promise.getId(), promise.getState(), promise.getTitle(), owner.getNickname(), isLeader, promise.getConfirmedDate(), promise.getConfirmedTime(), promise.getLocName(), promise.getLocAddress(), promise.getStartDate(), promise.getEndDate(), promise.getMemo(), promiseMembersInnerResponseDTOS, confirmedPeopleCount, allResponded);
+        return new PromiseDetailResponseDTO(promise.getId(), promise.getState(), promise.getTitle(), promise.getOwnerId(), isLeader, promise.getConfirmedDate(), promise.getConfirmedTime(), promise.getLocName(), promise.getLocAddress(), promise.getStartDate(), promise.getEndDate(), promise.getMemo(), promiseMembersInnerResponseDTOS, confirmedPeopleCount, allResponded);
     }
 
     // 대기중인 약속 -> 확정된 약속으로
