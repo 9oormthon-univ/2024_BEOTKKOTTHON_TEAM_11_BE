@@ -1,0 +1,57 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Removing old deployment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ~/prod/2024_BEOTKKOTTHON
+            podman-compose down 2>&1
+
+      - name: Getting source and build
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ~/prod/2024_BEOTKKOTTHON/Backend
+            git pull
+            rm -rf ./build
+            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-17.0.10.0.7-2.el8.x86_64
+            ./gradlew bootJar
+            podman rmi 2024goormthon/backend 2>&1
+            podman build -t 2024goormthon/backend .
+            
+      - name: Run deployment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ~/prod/2024_BEOTKKOTTHON/Backend
+            podman-compose up -d
