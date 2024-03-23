@@ -3,6 +3,7 @@ package com.groom.wisebab.controller;
 import com.groom.wisebab.domain.Member;
 import com.groom.wisebab.dto.email.EmailCertifyCodeDTO;
 import com.groom.wisebab.dto.email.EmailCertifyDTO;
+import com.groom.wisebab.dto.member.LoginRequest;
 import com.groom.wisebab.dto.member.MemberResponseDTO;
 import com.groom.wisebab.dto.member.SignUpDTO;
 import com.groom.wisebab.jwt.JWTUtil;
@@ -11,6 +12,7 @@ import com.univcert.api.UnivCert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +27,18 @@ public class MemberController {
 
     private final MemberService memberService;
     private final String UnivCertKEY = "48ad7af1-31bc-4c1f-ad01-f06001a618da";
-    private final JWTUtil jwtUtil;
 
     @PostMapping("/signup")
     public Long signUp(@RequestBody SignUpDTO signUpDTO) {
         return memberService.createMember(signUpDTO);
     }
+
+    /*
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        authenticationManager.authenticate()
+    }
+    */
 
     @PostMapping("/logout")
     public String logout() {
