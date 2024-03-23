@@ -13,4 +13,5 @@ public interface PreferTimetableRepository extends JpaRepository<PreferTimetable
 
      PreferTimetable findPreferTimeTableByPromiseAndMember(Promise promise, Member member);
 
+     List<PreferTimetable> findAllByPromise(Promise promise);
 }

@@ -33,8 +33,8 @@ public class PromiseController {
     }
 
     // 약속 단건 조회 {상태에 따라 pending일때와 confirmed, expired 일때}
-    @GetMapping("/promises/{promiseId}")
-    public ResponseEntity<PromiseDetailResponseDTO> findPromiseById(@PathVariable Long promiseId) {
+    @GetMapping("/promises/{promiseId}/details/members/{memberId}")
+    public ResponseEntity<PromiseDetailResponseDTO> findPromiseById(@PathVariable Long promiseId, @PathVariable Long memberId) {
 
         Promise promise = promiseService.findPromiseById(promiseId)
                 .orElseThrow(
@@ -42,7 +42,7 @@ public class PromiseController {
                 );
 
 
-        PromiseDetailResponseDTO promiseDetailResponseDTO = promiseService.convertToDTO(promise);
+        PromiseDetailResponseDTO promiseDetailResponseDTO = promiseService.convertToDTO(promiseId, memberId);
         return ResponseEntity.ok(promiseDetailResponseDTO);
     }
 

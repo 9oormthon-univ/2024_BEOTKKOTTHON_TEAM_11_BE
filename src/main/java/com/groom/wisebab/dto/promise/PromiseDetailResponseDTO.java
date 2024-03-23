@@ -28,6 +28,8 @@ public class PromiseDetailResponseDTO {
 
     private String ownerName;
 
+    private Boolean isLeader;
+
     private LocalDate confirmedDate;
 
     private String confirmedTime;
@@ -39,4 +41,10 @@ public class PromiseDetailResponseDTO {
     private String memo;
 
     private List<PromiseMembersInnerResponseDTO> participants;
+
+    private int confirmedPeopleCount;
+
+    private Boolean allResponded;
+
+
 }
