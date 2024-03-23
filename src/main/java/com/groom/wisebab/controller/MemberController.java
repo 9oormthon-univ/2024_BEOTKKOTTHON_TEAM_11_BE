@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class MemberController {
     private final JWTUtil jwtUtil;
 
     @PostMapping("/signup")
-    public Long signUp(SignUpDTO signUpDTO) {
+    public Long signUp(@RequestBody SignUpDTO signUpDTO) {
         return memberService.createMember(signUpDTO);
     }
 
