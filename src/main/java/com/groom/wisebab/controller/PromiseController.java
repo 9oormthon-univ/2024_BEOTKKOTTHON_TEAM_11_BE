@@ -46,12 +46,12 @@ public class PromiseController {
 
     // 상태에 따른 약속 리스트 조회
     @GetMapping("/members/{memberId}/promises")
-    public ResponseEntity<List<PromiseListResponseDTO>> findAllPromiseByMemberAndState(@PathVariable Long memberId, @RequestParam State state) {
+    public ResponseEntity<List<PromiseDetailResponseDTO>> findAllPromiseByMemberAndState(@PathVariable Long memberId, @RequestParam State state) {
 
         List<Promise> promises = promiseMemberService.findAllByMemberIdAndState(memberId, state);
-        List<PromiseListResponseDTO> promiseListResponseDTOList = promiseService.converToDTOList(promises);
+        List<PromiseDetailResponseDTO> promiseDetailResponseDTOList = promiseService.converToDTOList(promises, memberId);
 
-        return ResponseEntity.ok(promiseListResponseDTOList);
+        return ResponseEntity.ok(promiseDetailResponseDTOList);
     }
 
     // 대기중인 약속 -> 확정된 약속

@@ -24,7 +24,7 @@ public class PromiseDetailResponseDTO {
 
     private String title;
 
-    private String ownerName;
+    private Long ownerId;
 
     private Boolean isLeader;
 
