@@ -74,8 +74,20 @@ public class MemberController {
     // 이메일로 보낸 인증코드와 사용자가 입력한 코드가 일치하는지 검증
     @PostMapping("/verificationCode")
     public Map<String, Object> emailCodeVerification(@RequestBody EmailCertifyCodeDTO emailCertifyCodeDTO) throws IOException {
-        return UnivCert.certifyCode(UnivCertKEY, emailCertifyCodeDTO.getEmail(), emailCertifyCodeDTO.getUnivName(), emailCertifyCodeDTO.getCode());
+        Map<String, Object> result = UnivCert.certifyCode(UnivCertKEY, emailCertifyCodeDTO.getEmail(), emailCertifyCodeDTO.getUnivName(), emailCertifyCodeDTO.getCode());
+
+        log.info("인증된 이메일인지 체크");
+        UnivCert.status(UnivCertKEY, emailCertifyCodeDTO.getEmail());
+
+        log.info("인증 유저 리스트");
+        UnivCert.list(UnivCertKEY);
+
+        log.info("초기화 시작");
+        UnivCert.clear(UnivCertKEY);
+
+        return result;
     }
+
 
 
 }

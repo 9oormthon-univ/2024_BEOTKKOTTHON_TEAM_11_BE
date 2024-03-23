@@ -32,6 +32,16 @@ public class PreferTimetableService {
         return preferTimetable.getId();
     }
 
+    // 선호시간표 수정
+    @Transactional
+    public Long updatePreferTimetable(Promise promise, Member member, List<PreferTimetableDTO> timetableDTOS) {
+        List<Integer> timetables = flatPreferTimetable(timetableDTOS);
+        PreferTimetable preferTimetable = preferTimetableRepository.findPreferTimeTableByPromiseAndMember(promise, member);
+        preferTimetable.updatePreferTimetable(timetables);
+
+        return preferTimetable.getId();
+    }
+
     // 약속에서 멤버별 선호시간을 반환
     public List<PreferTimetableDTO> findTimetableByPromiseAndMember(Promise promise, Member member) {
         PreferTimetable preferTimeTable = preferTimetableRepository.findPreferTimeTableByPromiseAndMember(promise, member);
