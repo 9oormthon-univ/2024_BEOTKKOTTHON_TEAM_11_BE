@@ -9,6 +9,7 @@ import com.groom.wisebab.service.PromiseMemberService;
 import com.groom.wisebab.service.PromiseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +34,6 @@ public class PromiseController {
     // 약속 단건 조회 {상태에 따라 pending일때와 confirmed, expired 일때}
     @GetMapping("/promises/{promiseId}/details/members/{memberId}")
     public ResponseEntity<PromiseDetailResponseDTO> findPromiseById(@PathVariable Long promiseId, @PathVariable Long memberId) {
-
-        Promise promise = promiseService.findPromiseById(promiseId)
-                .orElseThrow(
-                        NullPointerException::new
-                );
-
 
         PromiseDetailResponseDTO promiseDetailResponseDTO = promiseService.convertToDTO(promiseId, memberId);
         return ResponseEntity.ok(promiseDetailResponseDTO);
@@ -82,12 +77,20 @@ public class PromiseController {
 
     // uuid로 이루어진 초대링크를 접속하면 그 회원을 약속 파티원으로 추가
     @PostMapping("/members/{memberId}/promises/{uuid}")
-    public Long memberParticipation(@PathVariable Long memberId, @PathVariable UUID uuid) {
+    public ResponseEntity<?> memberParticipation(@PathVariable Long memberId, @PathVariable UUID uuid) {
         Member member = memberService.findMemberById(memberId)
                 .orElseThrow(
                         NullPointerException::new
                 );
-        return promiseService.memberParticipation(member, uuid);
+        Promise promise = promiseService.findPromiseByUuid(uuid);
+
+        if (promiseMemberService.findPromiseMemberByMemberAndPromise(member, promise).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 참가한 회원입니다.");
+        }
+
+        Long promiseId = promiseService.memberParticipation(member, uuid);
+
+        return ResponseEntity.ok(promiseId);
     }
 
     // 약속의 송금 정보 조회

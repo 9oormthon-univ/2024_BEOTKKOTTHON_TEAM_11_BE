@@ -1,5 +1,6 @@
 package com.groom.wisebab.service;
 
+import com.groom.wisebab.domain.Member;
 import com.groom.wisebab.domain.Promise;
 import com.groom.wisebab.domain.PromiseMember;
 import com.groom.wisebab.domain.State;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,5 +32,9 @@ public class PromiseMemberService {
                 .map(PromiseMember::getPromise)
                 .filter(promise -> promise.getState() == state)
                 .toList();
+    }
+
+    public Optional<PromiseMember> findPromiseMemberByMemberAndPromise(Member member, Promise promise) {
+        return promiseMemberRepository.findPromiseMemberByMemberAndPromise(member, promise);
     }
 }
